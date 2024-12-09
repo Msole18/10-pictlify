@@ -16,6 +16,7 @@ import { SignUpValidation } from '@/lib/validation'
 import { INewUser } from '@/lib/types/types'
 import Loader from '@/components/shared/Loader'
 import { Link } from 'react-router-dom'
+import { createUserAccount } from '@/lib/appwrite/api'
 
 interface Props {
   name: string
@@ -24,6 +25,8 @@ interface Props {
 }
 
 const FieldForm = ({ name, type, form }: Props) => {
+  const inputType =
+    type === 'email' ? 'email' : type === 'password' ? 'password' : 'text'
   return (
     <FormField
       control={form}
@@ -32,7 +35,7 @@ const FieldForm = ({ name, type, form }: Props) => {
         <FormItem>
           <FormLabel>{name}</FormLabel>
           <FormControl>
-            <Input className="shad-input" type={type} {...field} />
+            <Input className="shad-input" type={inputType} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -55,9 +58,10 @@ const SignUpForm = () => {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof SignUpValidation>) {
-    // const newUser = await createUserAccount(values)
-    
+  async function onSubmit(values: z.infer<typeof SignUpValidation>) {
+    console.log(values.email)
+    const newUser = await createUserAccount(values)
+    console.log(newUser)
   }
   return (
     // <div className="flex flex-col justify-center items-center">
@@ -72,7 +76,10 @@ const SignUpForm = () => {
           To use Pictlify, Please enter your details
         </p>
 
-        <form className="flex flex-col gap-3 w-full mt-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-3 w-full mt-2"
+        >
           <FieldForm type="name" name="Name" form={form.control} />
           <FieldForm type="username" name="Username" form={form.control} />
           <FieldForm type="email" name="Email" form={form.control} />
