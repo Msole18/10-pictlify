@@ -17,6 +17,7 @@ import { INewUser } from '@/lib/types/types'
 import Loader from '@/components/shared/Loader'
 import { Link } from 'react-router-dom'
 import { createUserAccount } from '@/lib/appwrite/api'
+import { useToast } from '@/hooks/use-toast'
 
 interface Props {
   name: string
@@ -37,6 +38,7 @@ const FieldForm = ({ name, type, form }: Props) => {
           <FormControl>
             <Input className="shad-input" type={inputType} {...field} />
           </FormControl>
+          // eslint-disable-next-line react/react-in-jsx-scope
           <FormMessage />
         </FormItem>
       )}
@@ -45,6 +47,7 @@ const FieldForm = ({ name, type, form }: Props) => {
 }
 
 const SignUpForm = () => {
+  const { toast } = useToast()
   const isLoading = false
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -59,9 +62,14 @@ const SignUpForm = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
-    console.log(values.email)
     const newUser = await createUserAccount(values)
-    console.log(newUser)
+    if (!newUser) {
+      return toast({ 
+        title: 'Sign up faild, please try again.'
+      })
+    }
+
+    // const session = await signInAccount()
   }
   return (
     // <div className="flex flex-col justify-center items-center">
