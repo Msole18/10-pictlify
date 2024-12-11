@@ -13,11 +13,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { SignUpValidation } from '@/lib/validation'
-import { INewUser } from '@/lib/types/types'
+import { INewUser } from '@/types/types'
 import Loader from '@/components/shared/Loader'
 import { Link } from 'react-router-dom'
-import { createUserAccount } from '@/lib/appwrite/api'
 import { useToast } from '@/hooks/use-toast'
+import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queriesAndMutations'
 
 interface Props {
   name: string
@@ -48,8 +48,13 @@ const FieldForm = ({ name, type, form }: Props) => {
 
 const SignUpForm = () => {
   const { toast } = useToast()
-  const isLoading = false
-  // 1. Define your form.
+
+  const { mutateAsync: createUserAccount, isLoading: isCreatingUser } =
+    useCreateUserAccount()
+
+  const { mutateAsync: signInAccount, isLoading: isSignIn } = useSignInAccount()
+
+  // Form definition
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
@@ -60,22 +65,34 @@ const SignUpForm = () => {
     },
   })
 
-  // 2. Define a submit handler.
+  // Submit handler.
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
+    // Create new user account
     const newUser = await createUserAccount(values)
     if (!newUser) {
-      return toast({ 
-        title: 'Sign up faild, please try again.'
+      return toast({
+        title: 'Sign up faild, please try again.',
       })
     }
 
-    // const session = await signInAccount()
+    // Sign in user account
+    const session = await signInAccount({
+      email: values.email,
+      password: values.password,
+    })
+    if (!session) {
+      return toast({
+        title: 'Sign in faild, please try again.',
+      })
+    }
+
+    
   }
+
   return (
-    // <div className="flex flex-col justify-center items-center">
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
-        <img src="/assets/images/logo.svg" alt="logo" />
+        <img src="/assets/images/pictlify-logo.png" alt="logo" />
 
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
           Create a new account
@@ -94,7 +111,7 @@ const SignUpForm = () => {
           <FieldForm type="password" name="Password" form={form.control} />
 
           <Button type="submit" className="shad-button_primary">
-            {isLoading ? (
+            {isCreatingUser ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
