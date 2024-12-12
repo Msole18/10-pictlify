@@ -93,3 +93,15 @@ export const getCurrentUser = async () => {
     return null
   }
 }
+
+// ============================== SIGN UP
+export const signOutAccount = async () => {
+  try {
+    const session = await account.deleteSession('current')
+    return session
+    
+  } catch (error) {
+    console.error('Error:', error)
+    return null
+  }
+}
