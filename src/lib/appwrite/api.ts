@@ -80,8 +80,8 @@ export const getCurrentUser = async () => {
     if(!currentAccount) throw Error
 
     const currentUser = await databases.listDocuments(
-      appWriteConfig.databaseId, // Ya tienes el databaseId definido
-      appWriteConfig.userCollectionId, // Ahora estás pasando el userCollectionId
+      appWriteConfig.databaseId, 
+      appWriteConfig.userCollectionId, 
       [Query.equal('accountId', currentAccount.$id)]
     )
     if (!currentUser) throw Error

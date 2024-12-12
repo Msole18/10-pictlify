@@ -98,13 +98,12 @@ const SignUpForm = () => {
   return (
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
-        <div className="h-9 w-9 object-contain">
-          <img
-            src="/assets/images/pictlify-logo.png"
-            alt="logo"
-            className="h-full w-full"
-          />
-        </div>
+        <img
+          src="/assets/images/pictlify-logo.png"
+          alt="logo"
+          className="w-24 m-2"
+        />
+
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
           Create a new account
         </h2>
