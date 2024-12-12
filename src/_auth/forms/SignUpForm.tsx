@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import Loader from '@/components/shared/Loader'
+import {Loader} from '@/components/shared/Loader'
 import { SignUpValidation } from '@/lib/validation'
 import { useUserContext } from '@/context/AuthContext'
 import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queries'
@@ -39,7 +39,7 @@ const FieldForm = ({ name, type, form }: Props) => {
   )
 }
 
-const SignUpForm = () => {
+export const SignUpForm = () => {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext()
@@ -104,7 +104,7 @@ const SignUpForm = () => {
           className="w-24 m-2"
         />
 
-        <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
+        <h2 className="h3-bold md:h2-bold md:h2-bold mt-0">
           Create a new account
         </h2>
         <p className="text-light-3 small-medium md:base-regular mt-2">
@@ -144,4 +144,4 @@ const SignUpForm = () => {
   )
 }
 
-export default SignUpForm
+

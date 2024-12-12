@@ -1,10 +1,10 @@
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
 import { Route, Routes } from 'react-router-dom'
-import SignInForm from './_auth/forms/SignInForm'
-import SignUpForm from './_auth/forms/SignUpForm'
-import AuthLayout from './_auth/AuthLayout'
-import RootLayout from './_root/RootLayout'
+import {SignInForm} from './_auth/forms/SignInForm'
+import {SignUpForm} from './_auth/forms/SignUpForm'
+import {AuthLayout} from './_auth/AuthLayout'
+import {RootLayout} from './_root/RootLayout'
 import { Home } from './_root/pages'
 
 const App = () => {
