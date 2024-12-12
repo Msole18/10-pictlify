@@ -1,11 +1,6 @@
-import { Button } from "@/components/ui/button"
 
 const SignInForm = () => {
-  return (
-    <div>
-      <Button>Click me</Button>
-    </div>
-  )
+  return <div>SignInForm</div>
 }
 
 export default SignInForm
