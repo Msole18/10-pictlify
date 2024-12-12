@@ -2,22 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Control } from 'react-hook-form'
 import { z } from 'zod'
 
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { SignUpValidation } from '@/lib/validation'
-import { INewUser } from '@/types/types'
 import Loader from '@/components/shared/Loader'
-import { Link } from 'react-router-dom'
+import { SignUpValidation } from '@/lib/validation'
+import { useUserContext } from '@/context/AuthContext'
+import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queries'
+import { INewUser } from '@/types/types'
+import { Link, useNavigate } from 'react-router-dom'
 import { useToast } from '@/hooks/use-toast'
-import { useCreateUserAccount, useSignInAccount } from '@/lib/react-query/queriesAndMutations'
 
 interface Props {
   name: string
@@ -38,7 +32,6 @@ const FieldForm = ({ name, type, form }: Props) => {
           <FormControl>
             <Input className="shad-input" type={inputType} {...field} />
           </FormControl>
-          // eslint-disable-next-line react/react-in-jsx-scope
           <FormMessage />
         </FormItem>
       )}
@@ -48,11 +41,8 @@ const FieldForm = ({ name, type, form }: Props) => {
 
 const SignUpForm = () => {
   const { toast } = useToast()
-
-  const { mutateAsync: createUserAccount, isLoading: isCreatingUser } =
-    useCreateUserAccount()
-
-  const { mutateAsync: signInAccount, isLoading: isSignIn } = useSignInAccount()
+  const navigate = useNavigate()
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext()
 
   // Form definition
   const form = useForm<z.infer<typeof SignUpValidation>>({
@@ -65,13 +55,17 @@ const SignUpForm = () => {
     },
   })
 
+  // Queries
+  const { mutateAsync: createUserAccount, isPending: isCreatingAccount } = useCreateUserAccount()
+  const { mutateAsync: signInAccount, isPending: isSignIn } = useSignInAccount()
+
   // Submit handler.
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
     // Create new user account
     const newUser = await createUserAccount(values)
     if (!newUser) {
       return toast({
-        title: 'Sign up faild, please try again.',
+        title: 'Sign up faild, please try again.'
       })
     }
 
@@ -81,19 +75,36 @@ const SignUpForm = () => {
       password: values.password,
     })
     if (!session) {
-      return toast({
-        title: 'Sign in faild, please try again.',
-      })
+      toast({ title: 'Something went wrong. Please login your new account' })
+      navigate('/sign-in')
+      return
     }
 
-    
+    // Login user account
+    const isLoggenIn = await checkAuthUser()
+    if (isLoggenIn) {
+      form.reset()
+      navigate('/')
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Oops! Something went wrong.',
+        description: 'Login  faild, please try again.',
+      })
+      return
+    }
   }
 
   return (
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
-        <img src="/assets/images/pictlify-logo.png" alt="logo" />
-
+        <div className="h-9 w-9 object-contain">
+          <img
+            src="/assets/images/pictlify-logo.png"
+            alt="logo"
+            className="h-full w-full"
+          />
+        </div>
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
           Create a new account
         </h2>
@@ -111,7 +122,7 @@ const SignUpForm = () => {
           <FieldForm type="password" name="Password" form={form.control} />
 
           <Button type="submit" className="shad-button_primary">
-            {isCreatingUser ? (
+            {isCreatingAccount ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
