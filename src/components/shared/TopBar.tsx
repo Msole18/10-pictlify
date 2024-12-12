@@ -4,7 +4,7 @@ import { useSignOutAccount } from "@/lib/react-query/queries"
 import { useEffect } from "react"
 import { useUserContext } from "@/context/AuthContext"
 
-export const TopBar = () => {
+export const Topbar = () => {
   const navigate = useNavigate()
   const {mutate: signOut, isSuccess} = useSignOutAccount()
   const { user } = useUserContext()
