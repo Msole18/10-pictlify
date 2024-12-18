@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {Loader} from '@/components/shared/Loader'
+import { Loader } from '@/components/shared/Loader'
 import { SignInValidation } from '@/lib/validation'
 import { useUserContext } from '@/context/AuthContext'
 import { useSignInAccount } from '@/lib/react-query/queries'
@@ -68,6 +68,7 @@ export const SignInForm = () => {
       email: values.email,
       password: values.password,
     })
+    console.log({session})
     if (!session) {
       toast({ title: 'Something went wrong. Please login your new account' })
       navigate('/sign-in')

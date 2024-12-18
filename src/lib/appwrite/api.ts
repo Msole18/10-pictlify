@@ -1,5 +1,5 @@
-import { ID, Query } from 'appwrite'
-import { INewPost, INewUser } from '../../types/types'
+import { ID, ImageGravity, Query } from 'appwrite'
+import { INewPost, INewUser, IUpdatePost } from '../../types/types'
 import { account, appWriteConfig, avatars, databases, storage } from './config'
 
 // ============================== SIGN UP
@@ -27,7 +27,6 @@ export async function createUserAccount(user: INewUser) {
     return newUser;
   } catch (error) {
     console.log(error);
-    throw error;
   }
 }
 
@@ -50,12 +49,11 @@ export async function saveUserToDB(user: {
     return newUser;
   } catch (error) {
     console.log(error);
-    throw error
   }
 }
 
 
-// SIGN IN ACCOUNT
+// ============================== SIGN IN ACCOUNT
 export const signInAccount = async (user: {
   email: string
   password: string
@@ -70,14 +68,25 @@ export const signInAccount = async (user: {
     
   } catch (error) {
     console.error('Error:', error)
-    throw error
+  }
+}
+
+// ============================== GET ACCOUNT
+export const getAccount = async () => {
+  try {
+    const currentAccount = await account.get()
+
+    return currentAccount
+  } catch (error) {
+    console.log(error)
   }
 }
 
 // GET USER
 export const getCurrentUser = async () => {
   try {
-    const currentAccount = await account.get()
+    const currentAccount = await getAccount()
+   
     if(!currentAccount) throw Error
 
     const currentUser = await databases.listDocuments(
@@ -95,7 +104,7 @@ export const getCurrentUser = async () => {
   }
 }
 
-// ============================== SIGN UP
+// ============================== SIGN OUT
 export const signOutAccount = async () => {
   try {
     const session = await account.deleteSession('current')
@@ -103,7 +112,6 @@ export const signOutAccount = async () => {
     
   } catch (error) {
     console.error('Error:', error)
-    return null
   }
 }
 
@@ -116,7 +124,7 @@ export const createPost = async (post: INewPost) => {
    try {
      // 1. Upload file to appwrite storage
      const uploadedFile = await uploadFile(post.file[0])
-     console.log({ uploadedFile })
+
      if (!uploadedFile) throw Error
 
      // 2. Get file url
@@ -152,7 +160,6 @@ export const createPost = async (post: INewPost) => {
      return newPost
    } catch (error) {
     console.log(error);
-    throw error
   }
 }
 
@@ -168,7 +175,6 @@ export const uploadFile = async (file: File) => {
     return uploadFile
   } catch (error) {
     console.log(error)
-    throw error
   }
 }
 
@@ -180,27 +186,193 @@ export const getFilePreview = (fileId: string) => {
       fileId,
       2000, // width
       2000, // height
-      undefined, //gravity
+      ImageGravity.Top, //gravity
       100 //quality
     )
-    console.log({ fileUrl })
     return fileUrl
 
   } catch (error) {
     console.log(error)
-    throw  error
   }
 }
 
 // ============================== DELETE FILE
 export const deleteFile = async (fileId: string) => {
   try {
-    await storage.deleteFile(appWriteConfig.savesCollectionId, fileId)
-
+   const statusCode = await storage.deleteFile(
+     appWriteConfig.savesCollectionId,
+     fileId
+   )
+    
+    if (!statusCode) throw Error
+    
     return {status: 'ok'}
 
   } catch (error) {
     console.log(error)
-    throw error
+  }
+}
+
+// ============================== GET FILE URL
+export const getRecentPost = async () => {
+  try {
+    const post = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(20)]
+    )
+
+    if (!post) throw Error
+
+    return post
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== LIKE / UNLIKE POST
+export const likePost = async ( postId:string, likesArray: string[]) => {
+  try {
+    const updatedPost = await databases.updateDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      postId,
+      {
+        likes: likesArray
+      }
+    )
+
+    if(!updatedPost) throw Error
+
+    return updatedPost
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== SAVE POST
+export const savePost = async (postId: string, userId: string) => {
+  try {
+    const updatedPost = await databases.createDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.savesCollectionId,
+      ID.unique(),
+      {
+        user: userId,
+        post: postId,
+      }
+    )
+
+    if (!updatedPost) throw Error
+
+    return updatedPost
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== DELETE SAVED POST
+export const deleteSavedPost = async (savedRecordId: string) => {
+  try {
+    const statusCode = await databases.deleteDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.savesCollectionId,
+      savedRecordId
+    )
+
+    if (!statusCode) throw Error
+
+    return { status: 'ok' }
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== GET POST BY ID
+export const getPostByID = async (postId:string) => {
+  try {
+    const post = await databases.getDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      postId
+    )
+
+    if (!post) throw Error
+
+    return post
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== UPDATE POST
+export const updatePost = async (post: IUpdatePost) => {
+  const hasFileToUpdate = post.file.length > 0
+
+   try {
+    let image = {imageUrl: post.imageUrl, imageId: post.imageId}
+
+    if (hasFileToUpdate) {
+      // 1. Upload file to appwrite storage
+      const uploadedFile = await uploadFile(post.file[0])
+ 
+      if (!uploadedFile) throw Error
+      
+      // 2. Get file url
+      const fileUrl = getFilePreview(uploadedFile.$id)
+  
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id) // we delete de corrupted file
+        throw Error
+      }
+
+      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id }
+    }
+
+     // 3. Convert tags in an array
+     const tags = post.tags?.replace(/ /g, '').split(',')
+
+     // 4. Save post to databases
+     const updatedPost = await databases.updateDocument(
+       appWriteConfig.databaseId,
+       appWriteConfig.postCollectionId,
+       post.postId,
+       {
+         caption: post.caption,
+         imageUrl: image.imageUrl,
+         imageId: image.imageId,
+         location: post.location,
+         tags: tags,
+       }
+     )
+
+     if (!updatedPost) {
+       await deleteFile(post.imageId) // we delete de corrupted file
+       throw Error
+     }
+
+     return updatedPost
+   } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== DELETE POST
+export const deletePost = async (postId: string, imageId:string) => {
+  if (!postId || imageId) throw Error
+  try {
+    const statusCode = await databases.deleteDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      postId
+    )
+
+    if (!statusCode) throw Error
+
+    return { status: 'ok' }
+  } catch (error) {
+    console.log(error)
   }
 }
