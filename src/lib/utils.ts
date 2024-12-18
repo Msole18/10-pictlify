@@ -5,7 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString?: string): string {
+  if (!dateString) return 'Date not available'
   const inputDate = new Date(dateString)
   const now = new Date()
 

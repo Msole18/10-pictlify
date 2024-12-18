@@ -71,22 +71,11 @@ export const signInAccount = async (user: {
   }
 }
 
-// ============================== GET ACCOUNT
-export const getAccount = async () => {
+// ============================== GET USER
+export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get()
 
-    return currentAccount
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-// GET USER
-export const getCurrentUser = async () => {
-  try {
-    const currentAccount = await getAccount()
-   
     if(!currentAccount) throw Error
 
     const currentUser = await databases.listDocuments(

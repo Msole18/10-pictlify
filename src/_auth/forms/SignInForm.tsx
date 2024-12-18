@@ -68,7 +68,7 @@ export const SignInForm = () => {
       email: values.email,
       password: values.password,
     })
-    console.log({session})
+    
     if (!session) {
       toast({ title: 'Something went wrong. Please login your new account' })
       navigate('/sign-in')
