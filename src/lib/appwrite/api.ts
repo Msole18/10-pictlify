@@ -365,3 +365,54 @@ export const deletePost = async (postId: string, imageId:string) => {
     console.log(error)
   }
 }
+
+// ============================== INFINITE POST
+export const getInfinitePosts = async ({
+  pageParam,
+}: {
+  pageParam: string | null
+}) => {
+  console.log('Page Param:', pageParam)
+  const queries: any[] = [
+    Query.orderDesc('$updatedAt'), 
+    Query.limit(10)
+  ]
+
+  if (pageParam) {
+    queries.push(Query.cursorAfter(pageParam))
+  }
+
+  try {
+    const posts = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      queries
+    )
+
+    console.log('Posts:', posts)
+    if (!posts) throw Error
+
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== SEARCH POST
+export const searchPost = async (searchTerm:string) => {
+
+  try {
+    const posts = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      [Query.search('caption', searchTerm)]
+    )
+    
+    if(!posts) throw Error
+
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
