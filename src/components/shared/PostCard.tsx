@@ -56,7 +56,7 @@ export const PostCard = ({ post }: Props) => {
         </Link>
       </div>
 
-      <Link to={`/posts/:${post.$id}`}>
+      <Link to={`/posts/${post.$id}`}>
         <div className="small-medium lg:base-medium py-5">
           <p>{post.caption}</p>
           <ul className="flex gap-1 mt-2">
