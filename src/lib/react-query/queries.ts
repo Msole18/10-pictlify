@@ -14,6 +14,7 @@ import {
   getInfinitePosts,
   getPostByID,
   getRecentPost,
+  getUserById,
   likePost,
   savePost,
   searchPost,
@@ -220,5 +221,14 @@ export const useGetCreatorUsers = (limit: number) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_USERS],
     queryFn: () => getCreatorUsers(limit),
+  })
+}
+
+// ============================== GET USER BY ID
+export const useGetUserById = (userId:string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId, //this disable the automatic refechitng
   })
 }

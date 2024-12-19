@@ -10,6 +10,7 @@ type Props = {
 }
 export const GridPostList = ({ posts, showUser = true, showStats = true }: Props) => {
   const {user} = useUserContext()
+
   return (
     <ul className="grid-container">
       {posts.map((post) => (

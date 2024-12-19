@@ -376,7 +376,7 @@ export const getInfinitePosts = async ({
 }: {
   pageParam: string | null
 }) => {
-  console.log('Page Param:', pageParam)
+
   const queries: any[] = [
     Query.orderDesc('$updatedAt'), 
     Query.limit(10)
@@ -393,7 +393,6 @@ export const getInfinitePosts = async ({
       queries
     )
 
-    console.log('Posts:', posts)
     if (!posts) throw Error
 
     return posts
@@ -419,10 +418,10 @@ export const searchPost = async (searchTerm:string) => {
   }
 }
 
-
 // ============================================================
 // USER
 // ============================================================
+
 // ============================== GET TOP CREATOR USER
 export const getCreatorUsers = async (limit: number) => {
   try {
@@ -435,6 +434,23 @@ export const getCreatorUsers = async (limit: number) => {
     if (!creatorUsers) throw Error
 
     return creatorUsers
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== GET USER BY ID
+export const getUserById = async (userId:string) => {
+  try {
+    const user = await databases.getDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.userCollectionId,
+      userId
+    )
+
+    if (!user) throw Error
+
+    return user
   } catch (error) {
     console.log(error)
   }
