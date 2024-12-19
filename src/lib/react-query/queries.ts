@@ -9,6 +9,7 @@ import {
   createUserAccount,
   deletePost,
   deleteSavedPost,
+  getCreatorUsers,
   getCurrentUser,
   getInfinitePosts,
   getPostByID,
@@ -211,5 +212,13 @@ export const useGetCurrentUser = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_CURRENT_USER],
     queryFn: getCurrentUser,
+  })
+}
+
+// ============================== GET TOP CREATOR USER
+export const useGetCreatorUsers = (limit: number) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USERS],
+    queryFn: () => getCreatorUsers(limit),
   })
 }

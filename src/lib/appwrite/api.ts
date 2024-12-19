@@ -2,6 +2,10 @@ import { ID, ImageGravity, Query } from 'appwrite'
 import { INewPost, INewUser, IUpdatePost } from '../../types/types'
 import { account, appWriteConfig, avatars, databases, storage } from './config'
 
+// ============================================================
+// AUTH ACCOUNT
+// ============================================================
+
 // ============================== SIGN UP
 export async function createUserAccount(user: INewUser) {
   try {
@@ -416,3 +420,22 @@ export const searchPost = async (searchTerm:string) => {
   }
 }
 
+// ============================================================
+// USER
+// ============================================================
+// ============================== GET TOP CREATOR USER
+export const getCreatorUsers = async (limit: number) => {
+  try {
+    const creatorUsers = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.userCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(limit)]
+    )
+
+    if (!creatorUsers) throw Error
+
+    return creatorUsers
+  } catch (error) {
+    console.log(error)
+  }
+}
