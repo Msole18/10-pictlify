@@ -1,5 +1,5 @@
 import { ID, ImageGravity, Query } from 'appwrite'
-import { INewPost, INewUser, IUpdatePost } from '../../types/types'
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from '../../types/types'
 import { account, appWriteConfig, avatars, databases, storage } from './config'
 
 // ============================================================
@@ -453,5 +453,54 @@ export const getUserById = async (userId:string) => {
     return user
   } catch (error) {
     console.log(error)
+  }
+}
+
+// ============================== UPDATE USER
+export const updateUser = async (user: IUpdateUser) => {
+  const hasFileToUpdate = user.file.length > 0
+
+   try {
+    let image = {imageUrl: user.imageUrl, imageId: user.imageId}
+
+    if (hasFileToUpdate) {
+      // 1. Upload file to appwrite storage
+      const uploadedFile = await uploadFile(user.file[0])
+ 
+      if (!uploadedFile) throw Error
+      
+      // 2. Get file url
+      const fileUrl = getFilePreview(uploadedFile.$id)
+  
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id) // we delete de corrupted file
+        throw Error
+      }
+
+      image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id }
+    }
+
+
+     // 3. Save post to databases
+     const updatedUser = await databases.updateDocument(
+       appWriteConfig.databaseId,
+       appWriteConfig.userCollectionId,
+       user.userId,
+       {
+         name: user.name,
+         imageUrl: image.imageUrl,
+         imageId: image.imageId,
+         bio: user.bio,
+       }
+     )
+
+     if (!updatedUser) {
+       await deleteFile(user.imageId) // we delete de corrupted file
+       throw Error
+     }
+
+     return updatedUser
+   } catch (error) {
+    console.log(error);
   }
 }

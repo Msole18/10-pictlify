@@ -93,7 +93,7 @@ export const Profile = () => {
       </div>
 
       {currentUser.$id === user.id && (
-        <div className="flex max-w-5xl w-full">
+        <div className="flex flex-center max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
             className={`profile-tab rounded-l-lg ${

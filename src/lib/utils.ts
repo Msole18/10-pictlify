@@ -4,6 +4,11 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+export const convertFileToUrl = (file: File) => URL.createObjectURL(file)
+
+export const checkIsLiked = (likeList: string[], userId: string) => {
+  return likeList.includes(userId)
+}
 
 export function formatDate(dateString?: string): string {
   if (!dateString) return 'Date not available'
@@ -24,6 +29,3 @@ export function formatDate(dateString?: string): string {
   return `${diffInDays} days ago`
 }
 
-export const checkIsLiked = (likeList: string[], userId: string) => {
-  return likeList.includes(userId)
-}
