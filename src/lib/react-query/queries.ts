@@ -2,18 +2,21 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  // useInfiniteQuery,
+  useInfiniteQuery,
 } from '@tanstack/react-query'
 import {
   createPost,
   createUserAccount,
   deletePost,
   deleteSavedPost,
+  getCreatorUsers,
   getCurrentUser,
+  getInfinitePosts,
   getPostByID,
   getRecentPost,
   likePost,
   savePost,
+  searchPost,
   signInAccount,
   signOutAccount,
   updatePost,
@@ -174,6 +177,32 @@ export const useDeletePost = () => {
   })
 }
 
+// ============================== GET INFINITE POSTS 
+export const useGetPosts = () => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
+    queryFn: getInfinitePosts,
+    getNextPageParam: (lastPage) => {
+      // If there's no data, there are no more pages.
+      if (lastPage && lastPage.documents.length === 0) return null
+
+      // Use the $id of the last document as the cursor.
+      const lastId = lastPage?.documents[lastPage?.documents.length - 1].$id
+      return lastId
+    },
+    initialPageParam: null, 
+  })
+}
+
+// ============================== SEARCH POSTS 
+export const useSearchPosts = (searchTerm: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SEARCH_POSTS, searchTerm],
+    queryFn: () => searchPost(searchTerm),
+    enabled: !!searchTerm,
+  })
+}
+
 // ============================================================
 // USER QUERIES
 // ============================================================
@@ -183,5 +212,13 @@ export const useGetCurrentUser = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_CURRENT_USER],
     queryFn: getCurrentUser,
+  })
+}
+
+// ============================== GET TOP CREATOR USER
+export const useGetCreatorUsers = (limit: number) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USERS],
+    queryFn: () => getCreatorUsers(limit),
   })
 }

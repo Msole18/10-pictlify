@@ -1,3 +1,5 @@
+export const GET_TOP_CREATOR_USERS_LIMIT:number = 10
+
 export const sidebarLinks = [
   {
     imgURL: '/assets/icons/home.svg',

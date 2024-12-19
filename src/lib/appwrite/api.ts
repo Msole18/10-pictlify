@@ -2,6 +2,10 @@ import { ID, ImageGravity, Query } from 'appwrite'
 import { INewPost, INewUser, IUpdatePost } from '../../types/types'
 import { account, appWriteConfig, avatars, databases, storage } from './config'
 
+// ============================================================
+// AUTH ACCOUNT
+// ============================================================
+
 // ============================== SIGN UP
 export async function createUserAccount(user: INewUser) {
   try {
@@ -361,6 +365,76 @@ export const deletePost = async (postId: string, imageId:string) => {
     if (!statusCode) throw Error
 
     return { status: 'ok' }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== INFINITE POST
+export const getInfinitePosts = async ({
+  pageParam,
+}: {
+  pageParam: string | null
+}) => {
+  console.log('Page Param:', pageParam)
+  const queries: any[] = [
+    Query.orderDesc('$updatedAt'), 
+    Query.limit(10)
+  ]
+
+  if (pageParam) {
+    queries.push(Query.cursorAfter(pageParam))
+  }
+
+  try {
+    const posts = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      queries
+    )
+
+    console.log('Posts:', posts)
+    if (!posts) throw Error
+
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== SEARCH POST
+export const searchPost = async (searchTerm:string) => {
+  try {
+    const posts = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      [Query.search('caption', searchTerm)]
+    )
+    
+    if(!posts) throw Error
+
+    return posts
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+// ============================================================
+// USER
+// ============================================================
+// ============================== GET TOP CREATOR USER
+export const getCreatorUsers = async (limit: number) => {
+  try {
+    const creatorUsers = await databases.listDocuments(
+      appWriteConfig.databaseId,
+      appWriteConfig.userCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(limit)]
+    )
+
+    if (!creatorUsers) throw Error
+
+    return creatorUsers
   } catch (error) {
     console.log(error)
   }
