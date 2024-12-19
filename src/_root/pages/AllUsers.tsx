@@ -16,7 +16,6 @@ export const AllUsers = () => {
 
   if (isErrorCreators) {
     toast({ title: 'Something went wrong.' })
-
     return
   }
 
@@ -24,14 +23,13 @@ export const AllUsers = () => {
     <div className="common-container">
       <div className="user-container">
         <div className='flex gap-2'>
-
-        <img
-          src={'/assets/icons/people.svg'}
-          alt="people"
-          width={20}
-          height={20}
-        />
-        <h2 className="h3-bold md:h2-bold text-left w-full">All Users</h2>
+          <img
+            src={'/assets/icons/people.svg'}
+            alt="people"
+            width={36}
+            height={36}
+          />
+          <h2 className="h3-bold md:h2-bold text-left w-full">All Users</h2>
         </div>
         {isCreatorloading && !creators ? (
           <Loader />

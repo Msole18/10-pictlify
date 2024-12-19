@@ -404,7 +404,6 @@ export const getInfinitePosts = async ({
 
 // ============================== SEARCH POST
 export const searchPost = async (searchTerm:string) => {
-
   try {
     const posts = await databases.listDocuments(
       appWriteConfig.databaseId,
@@ -419,6 +418,7 @@ export const searchPost = async (searchTerm:string) => {
     console.log(error)
   }
 }
+
 
 // ============================================================
 // USER
