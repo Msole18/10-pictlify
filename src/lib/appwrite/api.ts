@@ -14,11 +14,11 @@ export async function createUserAccount(user: INewUser) {
       user.email,
       user.password,
       user.name
-    );
+    )
 
-    if (!newAccount) throw Error;
+    if (!newAccount) throw Error
 
-    const avatarUrl: string = avatars.getInitials(user.name);
+    const avatarUrl: string = avatars.getInitials(user.name)
 
     const newUser = await saveUserToDB({
       accountId: newAccount.$id,
@@ -26,21 +26,21 @@ export async function createUserAccount(user: INewUser) {
       email: newAccount.email,
       username: user.username,
       imageUrl: avatarUrl,
-    });
+    })
 
-    return newUser;
+    return newUser
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 }
 
 // ============================== SAVE USER TO DB
 export async function saveUserToDB(user: {
-  accountId: string;
-  email: string;
-  name: string;
-  imageUrl: string;
-  username?: string;
+  accountId: string
+  email: string
+  name: string
+  imageUrl: string
+  username?: string
 }) {
   try {
     const newUser = await databases.createDocument(
@@ -48,14 +48,13 @@ export async function saveUserToDB(user: {
       appWriteConfig.userCollectionId,
       ID.unique(),
       user
-    );
+    )
 
-    return newUser;
+    return newUser
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
 }
-
 
 // ============================== SIGN IN ACCOUNT
 export const signInAccount = async (user: {
@@ -69,7 +68,6 @@ export const signInAccount = async (user: {
     )
 
     return session
-    
   } catch (error) {
     console.error('Error:', error)
   }
@@ -80,17 +78,16 @@ export const getCurrentUser = async () => {
   try {
     const currentAccount = await account.get()
 
-    if(!currentAccount) throw Error
+    if (!currentAccount) throw Error
 
     const currentUser = await databases.listDocuments(
-      appWriteConfig.databaseId, 
-      appWriteConfig.userCollectionId, 
+      appWriteConfig.databaseId,
+      appWriteConfig.userCollectionId,
       [Query.equal('accountId', currentAccount.$id)]
     )
     if (!currentUser) throw Error
 
     return currentUser.documents[0]
-
   } catch (error) {
     console.error('Error:', error)
     return null
@@ -102,7 +99,6 @@ export const signOutAccount = async () => {
   try {
     const session = await account.deleteSession('current')
     return session
-    
   } catch (error) {
     console.error('Error:', error)
   }
@@ -114,45 +110,45 @@ export const signOutAccount = async () => {
 
 // ============================== CREATE POST
 export const createPost = async (post: INewPost) => {
-   try {
-     // 1. Upload file to appwrite storage
-     const uploadedFile = await uploadFile(post.file[0])
+  try {
+    // 1. Upload file to appwrite storage
+    const uploadedFile = await uploadFile(post.file[0])
 
-     if (!uploadedFile) throw Error
+    if (!uploadedFile) throw Error
 
-     // 2. Get file url
-     const fileUrl = getFilePreview(uploadedFile.$id)
+    // 2. Get file url
+    const fileUrl = getFilePreview(uploadedFile.$id)
 
-     if (!fileUrl) {
-       await deleteFile(uploadedFile.$id) // we delete de corrupted file
-       throw Error
-     }
+    if (!fileUrl) {
+      await deleteFile(uploadedFile.$id) // we delete de corrupted file
+      throw Error
+    }
 
-     // 3. Convert tags in an array
-     const tags = post.tags?.replace(/ /g, '').split(',')
+    // 3. Convert tags in an array
+    const tags = post.tags?.replace(/ /g, '').split(',')
 
-     // 4. Save post to databases
-     const newPost = await databases.createDocument(
-       appWriteConfig.databaseId,
-       appWriteConfig.postCollectionId,
-       ID.unique(),
-       {
-         creator: post.userId,
-         caption: post.caption,
-         imageUrl: fileUrl,
-         imageId: uploadedFile.$id,
-         location: post.location,
-         tags: tags,
-       }
-     )
+    // 4. Save post to databases
+    const newPost = await databases.createDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      ID.unique(),
+      {
+        creator: post.userId,
+        caption: post.caption,
+        imageUrl: fileUrl,
+        imageId: uploadedFile.$id,
+        location: post.location,
+        tags: tags,
+      }
+    )
 
-     if (!newPost) {
-       await deleteFile(uploadedFile.$id) // we delete de corrupted file
-       throw Error
-     }
-     return newPost
-   } catch (error) {
-    console.log(error);
+    if (!newPost) {
+      await deleteFile(uploadedFile.$id) // we delete de corrupted file
+      throw Error
+    }
+    return newPost
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -183,7 +179,6 @@ export const getFilePreview = (fileId: string) => {
       100 //quality
     )
     return fileUrl
-
   } catch (error) {
     console.log(error)
   }
@@ -192,15 +187,14 @@ export const getFilePreview = (fileId: string) => {
 // ============================== DELETE FILE
 export const deleteFile = async (fileId: string) => {
   try {
-   const statusCode = await storage.deleteFile(
-     appWriteConfig.savesCollectionId,
-     fileId
-   )
-    
-    if (!statusCode) throw Error
-    
-    return {status: 'ok'}
+    const statusCode = await storage.deleteFile(
+      appWriteConfig.savesCollectionId,
+      fileId
+    )
 
+    if (!statusCode) throw Error
+
+    return { status: 'ok' }
   } catch (error) {
     console.log(error)
   }
@@ -218,25 +212,24 @@ export const getRecentPost = async () => {
     if (!post) throw Error
 
     return post
-
   } catch (error) {
     console.log(error)
   }
 }
 
 // ============================== LIKE / UNLIKE POST
-export const likePost = async ( postId:string, likesArray: string[]) => {
+export const likePost = async (postId: string, likesArray: string[]) => {
   try {
     const updatedPost = await databases.updateDocument(
       appWriteConfig.databaseId,
       appWriteConfig.postCollectionId,
       postId,
       {
-        likes: likesArray
+        likes: likesArray,
       }
     )
 
-    if(!updatedPost) throw Error
+    if (!updatedPost) throw Error
 
     return updatedPost
   } catch (error) {
@@ -277,14 +270,13 @@ export const deleteSavedPost = async (savedRecordId: string) => {
     if (!statusCode) throw Error
 
     return { status: 'ok' }
-    
   } catch (error) {
     console.log(error)
   }
 }
 
 // ============================== GET POST BY ID
-export const getPostByID = async (postId:string) => {
+export const getPostByID = async (postId: string) => {
   try {
     const post = await databases.getDocument(
       appWriteConfig.databaseId,
@@ -304,18 +296,18 @@ export const getPostByID = async (postId:string) => {
 export const updatePost = async (post: IUpdatePost) => {
   const hasFileToUpdate = post.file.length > 0
 
-   try {
-    let image = {imageUrl: post.imageUrl, imageId: post.imageId}
+  try {
+    let image = { imageUrl: post.imageUrl, imageId: post.imageId }
 
     if (hasFileToUpdate) {
       // 1. Upload file to appwrite storage
       const uploadedFile = await uploadFile(post.file[0])
- 
+
       if (!uploadedFile) throw Error
-      
+
       // 2. Get file url
       const fileUrl = getFilePreview(uploadedFile.$id)
-  
+
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id) // we delete de corrupted file
         throw Error
@@ -324,36 +316,36 @@ export const updatePost = async (post: IUpdatePost) => {
       image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id }
     }
 
-     // 3. Convert tags in an array
-     const tags = post.tags?.replace(/ /g, '').split(',')
+    // 3. Convert tags in an array
+    const tags = post.tags?.replace(/ /g, '').split(',')
 
-     // 4. Save post to databases
-     const updatedPost = await databases.updateDocument(
-       appWriteConfig.databaseId,
-       appWriteConfig.postCollectionId,
-       post.postId,
-       {
-         caption: post.caption,
-         imageUrl: image.imageUrl,
-         imageId: image.imageId,
-         location: post.location,
-         tags: tags,
-       }
-     )
+    // 4. Save post to databases
+    const updatedPost = await databases.updateDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.postCollectionId,
+      post.postId,
+      {
+        caption: post.caption,
+        imageUrl: image.imageUrl,
+        imageId: image.imageId,
+        location: post.location,
+        tags: tags,
+      }
+    )
 
-     if (!updatedPost) {
-       await deleteFile(post.imageId) // we delete de corrupted file
-       throw Error
-     }
+    if (!updatedPost) {
+      await deleteFile(post.imageId) // we delete de corrupted file
+      throw Error
+    }
 
-     return updatedPost
-   } catch (error) {
-    console.log(error);
+    return updatedPost
+  } catch (error) {
+    console.log(error)
   }
 }
 
 // ============================== DELETE POST
-export const deletePost = async (postId: string, imageId:string) => {
+export const deletePost = async (postId: string, imageId: string) => {
   if (!postId || imageId) throw Error
   try {
     const statusCode = await databases.deleteDocument(
@@ -376,11 +368,7 @@ export const getInfinitePosts = async ({
 }: {
   pageParam: string | null
 }) => {
-
-  const queries: any[] = [
-    Query.orderDesc('$updatedAt'), 
-    Query.limit(10)
-  ]
+  const queries: any[] = [Query.orderDesc('$updatedAt'), Query.limit(10)]
 
   if (pageParam) {
     queries.push(Query.cursorAfter(pageParam))
@@ -402,15 +390,16 @@ export const getInfinitePosts = async ({
 }
 
 // ============================== SEARCH POST
-export const searchPost = async (searchTerm:string) => {
+export const searchPost = async (searchTerm: string) => {
   try {
+
     const posts = await databases.listDocuments(
       appWriteConfig.databaseId,
       appWriteConfig.postCollectionId,
-      [Query.search('caption', searchTerm)]
+      [Query.search('tags', searchTerm)]
     )
-    
-    if(!posts) throw Error
+
+    if (!posts) throw Error
 
     return posts
   } catch (error) {
@@ -428,7 +417,7 @@ export const getCreatorUsers = async (limit: number) => {
     const creatorUsers = await databases.listDocuments(
       appWriteConfig.databaseId,
       appWriteConfig.userCollectionId,
-      [Query.orderDesc('$createdAt'), Query.limit(limit)]
+      [Query.orderAsc('$createdAt'), Query.limit(limit)]
     )
 
     if (!creatorUsers) throw Error
@@ -440,7 +429,7 @@ export const getCreatorUsers = async (limit: number) => {
 }
 
 // ============================== GET USER BY ID
-export const getUserById = async (userId:string) => {
+export const getUserById = async (userId: string) => {
   try {
     const user = await databases.getDocument(
       appWriteConfig.databaseId,
@@ -460,18 +449,18 @@ export const getUserById = async (userId:string) => {
 export const updateUser = async (user: IUpdateUser) => {
   const hasFileToUpdate = user.file.length > 0
 
-   try {
-    let image = {imageUrl: user.imageUrl, imageId: user.imageId}
+  try {
+    let image = { imageUrl: user.imageUrl, imageId: user.imageId }
 
     if (hasFileToUpdate) {
       // 1. Upload file to appwrite storage
       const uploadedFile = await uploadFile(user.file[0])
- 
+
       if (!uploadedFile) throw Error
-      
+
       // 2. Get file url
       const fileUrl = getFilePreview(uploadedFile.$id)
-  
+
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id) // we delete de corrupted file
         throw Error
@@ -480,27 +469,26 @@ export const updateUser = async (user: IUpdateUser) => {
       image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id }
     }
 
+    // 3. Save post to databases
+    const updatedUser = await databases.updateDocument(
+      appWriteConfig.databaseId,
+      appWriteConfig.userCollectionId,
+      user.userId,
+      {
+        name: user.name,
+        bio: user.bio,
+        imageUrl: image.imageUrl,
+        imageId: image.imageId,
+      }
+    )
 
-     // 3. Save post to databases
-     const updatedUser = await databases.updateDocument(
-       appWriteConfig.databaseId,
-       appWriteConfig.userCollectionId,
-       user.userId,
-       {
-         name: user.name,
-         imageUrl: image.imageUrl,
-         imageId: image.imageId,
-         bio: user.bio,
-       }
-     )
-
-     if (!updatedUser) {
-       await deleteFile(user.imageId) // we delete de corrupted file
-       throw Error
-     }
-
-     return updatedUser
-   } catch (error) {
-    console.log(error);
+    if (!updatedUser) {
+      await deleteFile(user.imageId) // we delete de corrupted file
+      throw Error
+    }
+    console.log(updatedUser)
+    return updatedUser
+  } catch (error) {
+    console.log(error)
   }
 }

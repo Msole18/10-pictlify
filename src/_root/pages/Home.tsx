@@ -2,10 +2,12 @@ import { Loader } from "@/components/shared/Loader"
 import { PostCard } from "@/components/shared/PostCard"
 import { UserCard } from "@/components/shared/UserCard"
 import { GET_TOP_CREATOR_USERS_LIMIT } from "@/constants"
+import { useUserContext } from "@/context/AuthContext"
 import { useGetCreatorUsers, useGetRecentPost } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 
 export const Home = () => {
+  const {user} = useUserContext()
   const {data: posts, isPending: isPostloading, isError: isErrorPosts} = useGetRecentPost()
   const {
     data: creators,
@@ -13,8 +15,8 @@ export const Home = () => {
     isError: isErrorCreators,
   } = useGetCreatorUsers(GET_TOP_CREATOR_USERS_LIMIT)
 
-   if (isErrorPosts || isErrorCreators) {
-     return (
+  if (isErrorPosts || isErrorCreators) {
+    return (
        <div className="flex flex-1">
          <div className="home-container">
            <p className="body-medium text-light-1">Something bad happened</p>
@@ -23,9 +25,13 @@ export const Home = () => {
            <p className="body-medium text-light-1">Something bad happened</p>
          </div>
        </div>
-     )
-   }
-
+    )
+  }
+  
+  const filteredCreators = creators?.documents.filter(
+    (creator: Models.Document) => creator.$id !== user.id
+  )
+  
   return (
     <div className="flex flex-1">
       <div className="home-container">
@@ -51,7 +57,7 @@ export const Home = () => {
           <Loader />
         ) : (
           <ul className="grid 2xl:grid-cols-2 gap-6">
-            {creators?.documents.map((creator: Models.Document) => (
+            {filteredCreators?.map((creator: Models.Document) => (
               <li key={creator.$id}>
                 <UserCard user={creator} />
               </li>

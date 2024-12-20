@@ -5,6 +5,7 @@ import { useUserContext } from "@/context/AuthContext"
 import { useGetUserById } from "@/lib/react-query/queries"
 import { Link, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom"
 import { LikedPosts } from "./LikedPosts"
+import { useState } from "react"
 
 interface StabBlockProps {
   value: string | number
@@ -21,10 +22,11 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 export const Profile = () => {
   const { id } = useParams()
   const { pathname } = useLocation()
+  const [isFollowing, setIsFollowing] = useState<boolean>(false) 
   const { user } = useUserContext()
 
   const { data: currentUser } = useGetUserById(id || '')
-  
+  console.log(currentUser)
   if (!currentUser)
     return (
       <div className="flex-center w-full h-full">
@@ -85,7 +87,7 @@ export const Profile = () => {
             </div>
             <div className={`${user.id === id && 'hidden'}`}>
               <Button type="button" className="shad-button_primary px-8">
-                Follow
+                {isFollowing ? 'Follwing' : 'Follow'}
               </Button>
             </div>
           </div>

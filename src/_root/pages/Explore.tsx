@@ -11,7 +11,7 @@ export const Explore = () => {
   const { ref, inView } = useInView()
   const { data: posts, fetchNextPage, hasNextPage } = useGetPosts()
   const [searchValue, setSearchValue] = useState('')
-  const debounceValue = useDebounce(searchValue, 500)
+  const debounceValue = useDebounce(searchValue, 300)
 
   const { data: searchedPosts, isFetching: isSearchFetching } =
     useSearchPosts(debounceValue)
