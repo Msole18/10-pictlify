@@ -57,7 +57,7 @@ export const SignUpForm = () => {
 
   // Queries
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } = useCreateUserAccount()
-  const { mutateAsync: signInAccount, isPending: isSignIn } = useSignInAccount()
+  const { mutateAsync: signInAccount, isPending: isSignInAccount } = useSignInAccount()
 
   // Submit handler.
   async function onSubmit(values: z.infer<typeof SignUpValidation>) {
@@ -121,7 +121,7 @@ export const SignUpForm = () => {
           <FieldForm type="password" name="Password" form={form.control} />
 
           <Button type="submit" className="shad-button_primary">
-            {isCreatingAccount ? (
+            {isCreatingAccount || isSignInAccount || isUserLoading ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
