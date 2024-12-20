@@ -14,14 +14,16 @@ import {
   getInfinitePosts,
   getPostByID,
   getRecentPost,
+  getUserById,
   likePost,
   savePost,
   searchPost,
   signInAccount,
   signOutAccount,
   updatePost,
+  updateUser,
 } from '../appwrite/api'
-import { INewPost, INewUser, IUpdatePost } from '@/types/types'
+import { INewPost, INewUser, IUpdatePost, IUpdateUser } from '@/types/types'
 import { QUERY_KEYS } from './queryKey'
 
 // ============================================================
@@ -220,5 +222,30 @@ export const useGetCreatorUsers = (limit: number) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_USERS],
     queryFn: () => getCreatorUsers(limit),
+  })
+}
+
+// ============================== GET USER BY ID
+export const useGetUserById = (userId:string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_BY_ID, userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId, //this disable the automatic refechitng
+  })
+}
+
+// ============================== UPDATE USER MUTATION
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (user: IUpdateUser) => updateUser(user),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id],
+      })
+    },
   })
 }

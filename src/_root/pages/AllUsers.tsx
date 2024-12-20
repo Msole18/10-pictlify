@@ -1,13 +1,14 @@
 import { Loader } from '@/components/shared/Loader'
 import { UserCard } from '@/components/shared/UserCard'
 import { GET_TOP_CREATOR_USERS_LIMIT } from '@/constants'
+import { useUserContext } from '@/context/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import { useGetCreatorUsers } from '@/lib/react-query/queries'
 import { Models } from 'appwrite'
 
 export const AllUsers = () => {
   const { toast } = useToast()
-
+  const {user} = useUserContext()
   const {
       data: creators,
       isPending: isCreatorloading,
@@ -19,10 +20,14 @@ export const AllUsers = () => {
     return
   }
 
+  const filteredCreators = creators?.documents.filter(
+    (creator: Models.Document) => creator.$id !== user.id
+  )
+
   return (
     <div className="common-container">
       <div className="user-container">
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <img
             src={'/assets/icons/people.svg'}
             alt="people"
@@ -35,7 +40,7 @@ export const AllUsers = () => {
           <Loader />
         ) : (
           <ul className="user-grid">
-            {creators?.documents.map((creator: Models.Document) => (
+            {filteredCreators?.map((creator: Models.Document) => (
               <li key={creator.$id} className="flex-1 min-w-[200px] w-full">
                 <UserCard user={creator} />
               </li>
