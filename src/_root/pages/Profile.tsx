@@ -24,16 +24,19 @@ export const Profile = () => {
   const { pathname } = useLocation()
   const [isFollowing, setIsFollowing] = useState<boolean>(false) 
   const { user } = useUserContext()
-
   const { data: currentUser } = useGetUserById(id || '')
-  console.log(currentUser)
-  if (!currentUser)
+
+  if (!currentUser) {
     return (
       <div className="flex-center w-full h-full">
         <Loader />
       </div>
     )
-
+  }
+  const handleFollowing = () => {
+    setIsFollowing(!isFollowing)
+  } 
+    
   return (
     <div className="profile-container">
       <div className="profile-inner_container">
@@ -86,7 +89,11 @@ export const Profile = () => {
               </Link>
             </div>
             <div className={`${user.id === id && 'hidden'}`}>
-              <Button type="button" className="shad-button_primary px-8">
+              <Button
+                type="button"
+                className="shad-button_primary px-8"
+                onClick={handleFollowing}
+              >
                 {isFollowing ? 'Follwing' : 'Follow'}
               </Button>
             </div>

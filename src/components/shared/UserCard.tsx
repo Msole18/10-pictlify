@@ -12,6 +12,7 @@ export const UserCard = ({ user }: Props) => {
   const handleFollowing = () => {
     setIsFollowing(!isFollowing)
   } 
+  
   return (
     <div className="user-card">
       <Link
