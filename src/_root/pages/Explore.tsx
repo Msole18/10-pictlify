@@ -51,7 +51,10 @@ export const Explore = () => {
             placeholder="Search"
             className="explore-search"
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) => {
+              const { value } = e.target
+              setSearchValue(value)
+            }}
           />
         </div>
       </div>
@@ -79,13 +82,10 @@ export const Explore = () => {
         ) : shouldShowPosts ? (
           <p className="text-light-4 mt-10 text-center w-full">End of post</p>
         ) : (
-          posts.pages.map(
-            (item, index) =>{
-              if (!item) return null 
-              return (
-                <GridPostList key={`page-${index}`} posts={item.documents} />
-              )
-            })
+          posts.pages.map((item, index) => {
+            if (!item) return null
+            return <GridPostList key={`page-${index}`} posts={item.documents} />
+          })
         )}
       </div>
 

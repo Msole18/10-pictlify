@@ -5,7 +5,7 @@ export const Bottombar = () => {
   const { pathname } = useLocation()
 
   return (
-    <section className="bottom-bar">
+    <section className="bottom-bar w-full">
       {bottombarLinks.map((link) => {
         const isActive = pathname === link.route
 

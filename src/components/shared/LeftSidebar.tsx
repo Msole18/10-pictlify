@@ -17,15 +17,17 @@ export const LeftSidebar = () => {
 
   return (
     <nav className="leftsidebar">
-      <div className="flex flex-col gap-11 items-center">
-        <Link to="/" className="flex gap-3 items-center">
-          <img
-            src="/assets/images/pictlify-logo.png"
-            alt="logo"
-            width={65}
-            height={15}
-          />
-        </Link>
+      <div className="flex flex-col gap-11 ">
+        <div className="flex flex-col items-center">
+          <Link to="/" className="flex gap-3 items-center">
+            <img
+              src="/assets/images/pictlify-logo.png"
+              alt="logo"
+              width={65}
+              height={15}
+            />
+          </Link>
+        </div>
 
         <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
           <img
@@ -75,7 +77,7 @@ export const LeftSidebar = () => {
         onClick={() => signOut()}
       >
         <img src="/assets/icons/logout.svg" alt="logout" />
-        <p className='small-medium lg:base-medium'>Logout</p>
+        <p className="small-medium lg:base-medium">Logout</p>
       </Button>
     </nav>
   )
