@@ -38,8 +38,8 @@ export default {
         xs: '480px',
       },
       width: {
-        420: '420px',
-        465: '465px',
+        420: '300px',
+        465: '365px',
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],

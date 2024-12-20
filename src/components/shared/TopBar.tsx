@@ -14,14 +14,14 @@ export const Topbar = () => {
   }, [isSuccess])
 
   return (
-    <section className="topbar">
+    <section className="topbar w-full">
       <div className="flex-between py-4 px-5">
         <Link to="/" className="flex gap-3 items-center">
           <img
             src="/assets/images/pictlify-logo.png"
             alt="logo"
-            width={65}
-            height={25}
+            width={55}
+            height={20}
           />
         </Link>
 
@@ -34,7 +34,7 @@ export const Topbar = () => {
             <img src="/assets/icons/logout.svg" alt="logout" />
           </Button>
 
-          <Link to={`/profile/${user.id}`} className="flex gap-3">
+          <Link to={`/profile/${user.id}`} className="flex-center gap-3">
             <img
               src={user.imageUrl || '/assets/images/profile-placeholder.svg'}
               alt="profile"

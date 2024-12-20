@@ -15,6 +15,7 @@ import {
   getPostByID,
   getRecentPost,
   getUserById,
+  getUserPosts,
   likePost,
   savePost,
   searchPost,
@@ -150,6 +151,15 @@ export const useGetPostById = (postId:string) => {
     queryKey: [QUERY_KEYS.GET_POST_BY_ID, postId],
     queryFn: () => getPostByID(postId),
     enabled: !!postId //this disable the automatic refechitng
+  })
+}
+
+// ============================== GET USER POSTS
+export const useGetUserPosts = (userId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_USER_POSTS, userId],
+    queryFn: () => getUserPosts(userId),
+    enabled: !!userId,
   })
 }
 
